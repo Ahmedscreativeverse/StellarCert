@@ -56,12 +56,12 @@ impl CRLContract {
     /// Initialize the CRL contract with an issuer
     pub fn initialize(env: Env, issuer: Address) {
         // Check if already initialized
-        if env.storage().instance().has(&(&b"CRL_ISSUER"[..])) {
+        if env.ttl_instance().has(&(&b"CRL_ISSUER"[..])) {
             panic!("CRL already initialized");
         }
         
         // Store issuer
-        env.storage().instance().set(&(&b"CRL_ISSUER"[..]), &issuer);
+        env.ttl_instance().set(&(&b"CRL_ISSUER"[..]), &issuer);
         
         // Initialize CRL
         let crl_info = CRLInfo {
@@ -73,7 +73,7 @@ impl CRLContract {
             merkle_root: String::from_str(&env, "initial_root"),
         };
         
-        env.storage().instance().set(&(&b"CRL_INFO"[..]), &crl_info);
+        env.ttl_instance().set(&(&b"CRL_INFO"[..]), &crl_info);
     }
 
     /// Revoke a certificate
@@ -88,7 +88,7 @@ impl CRLContract {
             .expect("CRL not initialized");
         
         // Check if already revoked
-        if env.storage().instance().has(&(&certificate_id.clone().into_bytes()[..])) {
+        if env.ttl_instance().has(&(&certificate_id.clone().into_bytes()[..])) {
             panic!("Certificate already revoked");
         }
         
@@ -106,7 +106,7 @@ impl CRLContract {
         };
         
         // Store individual revocation info for quick lookup
-        env.storage().instance().set(&(&certificate_id.into_bytes()[..]), &revocation_info);
+        env.ttl_instance().set(&(&certificate_id.into_bytes()[..]), &revocation_info);
         
         // Update CRL info
         crl_info.revoked_count += 1;
@@ -117,7 +117,7 @@ impl CRLContract {
         crl_info.merkle_root = String::from_str(&env, &format!("root_{}", crl_info.crl_number));
         
         // Store updated CRL info
-        env.storage().instance().set(&(&b"CRL_INFO"[..]), &crl_info);
+        env.ttl_instance().set(&(&b"CRL_INFO"[..]), &crl_info);
     }
 
     /// Unrevoke (remove) a certificate from the CRL
@@ -149,15 +149,15 @@ impl CRLContract {
         crl_info.merkle_root = String::from_str(&env, &format!("root_{}", crl_info.crl_number));
         
         // Store updated CRL info
-        env.storage().instance().set(&(&b"CRL_INFO"[..]), &crl_info);
+        env.ttl_instance().set(&(&b"CRL_INFO"[..]), &crl_info);
         
         // Remove individual revocation info
-        env.storage().instance().remove(&(&certificate_id.into_bytes()[..]));
+        env.ttl_instance().remove(&(&certificate_id.into_bytes()[..]));
     }
 
     /// Check if a certificate is revoked
     pub fn is_revoked(env: Env, certificate_id: String) -> bool {
-        env.storage().instance().has(&(&certificate_id.into_bytes()[..]))
+        env.ttl_instance().has(&(&certificate_id.into_bytes()[..]))
     }
 
     /// Get revocation info for a specific certificate
@@ -194,7 +194,7 @@ impl CRLContract {
             .get(&(&b"CRL_INFO"[..]))
             .expect("CRL info not found");
         
-        let is_revoked = env.storage().instance().has(&(&certificate_id.into_bytes()[..]));
+        let is_revoked = env.ttl_instance().has(&(&certificate_id.into_bytes()[..]));
         
         VerificationResult {
             is_revoked,
@@ -228,7 +228,7 @@ impl CRLContract {
         crl_info.merkle_root = String::from_str(&env, &format!("root_{}", crl_info.crl_number));
         
         // Store updated CRL info
-        env.storage().instance().set(&(&b"CRL_INFO"[..]), &crl_info);
+        env.ttl_instance().set(&(&b"CRL_INFO"[..]), &crl_info);
     }
 
     /// Check if CRL needs updating (based on next_update)

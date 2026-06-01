@@ -23,7 +23,7 @@ pub fn propose_certificate(
 
     // Certificate proposal logic
     // Example: storing in contract storage
-    env.storage().set(&cert_data.id, &cert_data);
+    env.ttl_instance().set(&cert_data.id, &cert_data);
 
     // Optional: Emit event
     env.events().publish(

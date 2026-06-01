@@ -80,10 +80,12 @@ npm run security:audit
 
 ### Environment Variables
 
-For contract deployment, the following secrets are required:
+For contract deployment, the following secrets and variables are used:
 
-- `STELLAR_SECRET_KEY`: Stellar account secret key for deployment
-- `STELLAR_NETWORK_PASSPHRASE`: Network passphrase (Testnet/Public)
+- `SOROBAN_ADMIN_SECRET`: Soroban admin secret key for deployment
+- `SOROBAN_RPC_URL`: Soroban RPC URL for contract deployment
+- `SOROBAN_NETWORK`: Network label used during deployment (for example `testnet` or `public`)
+- `STELLAR_NETWORK`: Optional legacy network label fallback (defaults to `testnet` if unset)
 
 ### Branch Protection
 
